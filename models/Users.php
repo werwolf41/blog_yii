@@ -3,12 +3,11 @@
 namespace app\models;
 
 use Yii;
-use yii\base\Security;
+use yii\web\IdentityInterface;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
-use yii\web\IdentityInterface;
-
+use yii\base\Security;
 
 /**
  * This is the model class for table "users".
@@ -16,25 +15,43 @@ use yii\web\IdentityInterface;
  * @property integer $id
  * @property string $name
  * @property string $email
- * @property string $password
- * @property integer $sold
+ * @property string $sold
  * @property string $created_at
  * @property string $updated_at
  * @property string $last_sing_in
+ * @property string $auth_key
+ * @property string $password_hash
+ * @property string $password_reset_token
+ * @property integer $status
  *
  * @property Category[] $categories
  * @property Posts[] $posts
  * @property Tags[] $tags
  */
-class Users extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
-
+class Users extends \yii\db\ActiveRecord implements IdentityInterface
 {
+
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
         return 'users';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['password_hash', 'name', 'email'], 'required'],
+            [['password_hash', 'name', 'email'], 'unique'],
+            [['created_at', 'updated_at', 'last_sing_in'], 'safe'],
+            [['status'], 'integer'],
+            [['name', 'email', 'password_hash', 'password_reset_token'], 'string', 'max' => 255],
+            [['sold', 'auth_key'], 'string', 'max' => 32],
+        ];
     }
 
     public function behaviors()
@@ -46,25 +63,9 @@ class Users extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
                     ActiveRecord::EVENT_BEFORE_INSERT => ['created_at', 'updated_at'],
                     ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
                 ],
-                 'value' => new Expression('NOW()'),
+                'value' => new Expression('NOW()'),
             ]
 
-        ];
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-            [['sold'], 'string', 'max'=>32],
-            [['name', 'email', 'password'], 'required'],
-            [['created_at', 'updated_at', 'last_sing_in'], 'safe'],
-            [['name', 'email', 'password'], 'string', 'max' => 255],
-            ['email', 'email'],
-            [['email', 'password'], 'string', 'min'=>6],
         ];
     }
 
@@ -77,11 +78,14 @@ class Users extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             'id' => 'ID',
             'name' => 'Name',
             'email' => 'Email',
-            'password' => 'Password',
             'sold' => 'Sold',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'last_sing_in' => 'Last Sing In',
+            'auth_key' => 'Auth Key',
+            'password_hash' => 'Password Hash',
+            'password_reset_token' => 'Password Reset Token',
+            'status' => 'Status',
         ];
     }
 
@@ -130,5 +134,10 @@ class Users extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function validateAuthKey($authKey)
     {
         return $this->getAuthKey() === $authKey;
+    }
+
+    public function createPasswordHash($password, $cost = null ){
+        $security = new Security();
+        return $security->generatePasswordHash($password, $cost);
     }
 }

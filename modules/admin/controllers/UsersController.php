@@ -4,12 +4,10 @@ namespace app\modules\admin\controllers;
 
 use Yii;
 use app\models\Users;
-use yii\base\Security;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-
 
 /**
  * UsersController implements the CRUD actions for Users model.
@@ -28,7 +26,6 @@ class UsersController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
-
         ];
     }
 
@@ -68,7 +65,12 @@ class UsersController extends Controller
     {
         $model = new Users();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+
+            $model->password_hash = $model->createPasswordHash($model->password_hash);
+
+            $model->save();
+
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
@@ -125,5 +127,7 @@ class UsersController extends Controller
         }
     }
 
+    public function beforeSave(){
 
+    }
 }

@@ -16,15 +16,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'password')->passwordInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'password_hash')->passwordInput(['maxlength' => true]) ?>
 
-    <!-- <?/*= $form->field($model, 'sold')->textInput() */?> -->
-
-  <!--  <?/*= $form->field($model, 'created_at')->textInput() */?>
-
-    <?/*= $form->field($model, 'updated_at')->textInput() */?>
-
-    --><?/*= $form->field($model, 'last_sing_in')->textInput() */?>
+    <?= $form->field($model, 'status')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
