@@ -7,6 +7,7 @@ use yii\base\Security;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
+use yii\web\IdentityInterface;
 
 
 /**
@@ -25,7 +26,8 @@ use yii\db\Expression;
  * @property Posts[] $posts
  * @property Tags[] $tags
  */
-class Users extends \yii\db\ActiveRecord
+class Users extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
+
 {
     /**
      * @inheritdoc
@@ -57,7 +59,7 @@ class Users extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['sold'], 'integer'],
+            [['sold'], 'string', 'max'=>32],
             [['name', 'email', 'password'], 'required'],
             [['created_at', 'updated_at', 'last_sing_in'], 'safe'],
             [['name', 'email', 'password'], 'string', 'max' => 255],
@@ -84,28 +86,49 @@ class Users extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * Finds an identity by the given ID.
+     *
+     * @param string|integer $id the ID to be looked for
+     * @return IdentityInterface|null the identity object that matches the given ID.
      */
-    public function getCategories()
+    public static function findIdentity($id)
     {
-        return $this->hasMany(Category::className(), ['user_id' => 'id']);
+        return static::findOne($id);
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * Finds an identity by the given token.
+     *
+     * @param string $token the token to be looked for
+     * @return IdentityInterface|null the identity object that matches the given token.
      */
-    public function getPosts()
+    public static function findIdentityByAccessToken($token, $type = null)
     {
-        return $this->hasMany(Posts::className(), ['user_id' => 'id']);
+        return static::findOne(['access_token' => $token]);
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return int|string current user ID
      */
-    public function getTags()
+    public function getId()
     {
-        return $this->hasMany(Tags::className(), ['user_id' => 'id']);
+        return $this->id;
     }
 
+    /**
+     * @return string current user auth key
+     */
+    public function getAuthKey()
+    {
+        return $this->auth_key;
+    }
 
+    /**
+     * @param string $authKey
+     * @return boolean if auth key is valid for current user
+     */
+    public function validateAuthKey($authKey)
+    {
+        return $this->getAuthKey() === $authKey;
+    }
 }

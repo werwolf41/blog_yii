@@ -17,7 +17,7 @@ class m170215_120627_create_users_table extends Migration
             'name'=>$this->string(255),
             'email'=>$this->string(255),
             'password'=>$this->string(255),
-            'sold'=>$this->integer(4),
+            'sold'=>$this->string(32),
             'created_at' => $this->datetime()->notNull(),
             'updated_at' => $this->datetime(),
             'last_sing_in' => $this->datetime(),

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\base\Security;
 
 /**
  * This is the model class for table "posts".
@@ -53,13 +54,13 @@ class Posts extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'title' => 'Title',
-            'desctiption' => 'Desctiption',
-            'content' => 'Content',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
-            'user_id' => 'User ID',
-            'image' => 'Image',
+            'title' => 'Название',
+            'desctiption' => 'Описание',
+            'content' => 'Текст',
+            'created_at' => 'Создан',
+            'updated_at' => 'Изменен',
+            'user_id' => 'Автор',
+            'image' => 'Изображение',
         ];
     }
 
